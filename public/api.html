@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>API Example</title>
+    <style>
+        body {
+            background-color: #222222;
+            color: #bbbbbb;
+            font-family: Consolas, "JetBrains Mono", monospace;
+            max-width: 1200px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .contents {
+            text-align: left;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="contents">
+    <h1>API Example</h1>
+    <h2>1. GET /files/:filename</h2>
+    <p>Download a file using its file uuid</p>
+    <p>Example: <code>/files/875ec8d9-a512-436b-8d3f-adaa2122b7b7</code></p>
+    <h3>Supported Parameters</h3>
+    <ul>
+        <li>
+            <p>attachment: boolean (default: false)</p>
+            <p>Download the file as a attachment, usually trigger direct download</p>
+        </li>
+    </ul>
+    <br>
+    <h2>2. GET /files</h2>
+    <p>Get all files stored</p>
+    <p>Example: <code>/files</code></p>
+    <h3>Result format</h3>
+    <p><code>{[uuid]: {fileType: [MIME Type], filename: [Filename]}}</code></p>
+    <p>Example:
+        <code>{"875ec8d9-a512-436b-8d3f-adaa2122b7b7":{"contentType":"text/markdown","filename":"README.md"},"b5166d9c-8273-4969-badd-b00768d707a6":{"contentType":"text/plain","filename":"LICENSE.txt"}}</code>
+    </p>
+    <br>
+    <h2>3. POST /files</h2>
+    <p>Upload a file to storage</p>
+    <p>Example: <code>/files?filename=image.png</code></p>
+    <h3>Supported Parameters</h3>
+    <ul>
+        <li>
+            <p>filename: string (default: uuid of the file)</p>
+            <p>Set the filename of the file. Will be shown when it is downloaded</p>
+        </li>
+    </ul>
+    <h3>Result format</h3>
+    <p><code>{filename: [File UUID]}</code></p>
+    <p>Example: <code>{"filename": "875ec8d9-a512-436b-8d3f-adaa2122b7b7"}</code></p>
+    <br>
+    <h2>4. DELETE /files/:filename</h2>
+    <p>Delete a file using its file uuid</p>
+    <p>Example: <code>/files/875ec8d9-a512-436b-8d3f-adaa2122b7b7</code></p>
+    </div>
+</body>
+</html>

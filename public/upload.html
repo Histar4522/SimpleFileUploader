@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload</title>
+</head>
+<body>
+<p><input type="file" id="file"></p>
+<p><label for="filename" style="font-family: sans-serif;font-size: small;">Custom File Name: </label><input type="text" id="filename" style="width: 400px"></p>
+<p><button type="button" id="update">Upload</button></p>
+<p id="status"></p>
+
+<script>
+    document.getElementById("file").addEventListener("change", e => {
+        const fileInput = document.getElementById("file");
+        const file = fileInput.files[0];
+        if (!file) {
+            document.getElementById("filename").placeholder = "";
+            return;
+        }
+        document.getElementById("filename").placeholder = file.name;
+    })
+    document.getElementById("update").addEventListener("click", async () => {
+        const fileInput = document.getElementById("file");
+        const file = fileInput.files[0];
+
+        if (!file) {
+            alert("Please select a file first!");
+            return;
+        }
+
+        const buffer = await file.arrayBuffer();
+
+        try {
+            const filename = document.getElementById("filename").value ? document.getElementById("filename").value : file.name;
+            const res = await fetch(`http://localhost:8080/files?filename=${encodeURI(filename)}`, {
+                method: "post",
+                headers: {
+                    "Content-Type": file.type || "application/octet-stream",
+                },
+                body: buffer
+            });
+
+            if (res.ok) {
+                let content = await res.json()
+                document.getElementById("status").innerHTML =
+                    `Upload successful, ID: <code onclick="navigator.clipboard.writeText('${content.filename}')" style="cursor: pointer;color: blue;text-decoration: underline" title="Click to copy">${content.filename}</code>`
+                fileInput.value = null;
+                document.getElementById("filename").placeholder = "";
+            } else {
+                document.getElementById("status").innerHTML = `<span style="color: red">Upload failed, ${res.status} ${res.statusText}</span>`
+            }
+        } catch (e) {
+            document.getElementById("status").innerHTML = `<span style="color: red">Upload failed, ${e}</span>`
+        }
+    });
+</script>
+</body>
+</html>
