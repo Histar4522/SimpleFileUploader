@@ -9,7 +9,7 @@ const db = new Sequelize({
     dialect: "sqlite",
     storage: path.join(".", "fs", "database.sqlite"),
     logging: sql => {
-        logger.log("DATABASE", sql);
+        logger.debug("DATABASE", sql);
     }
 });
 
@@ -84,11 +84,52 @@ async function login(username, password) {
 }
 
 async function generateToken(id) {
+    await removeToken(id)
     const record = await token.create({
         account: id,
         expire: Date.now() + 1800000 /* 30min */,
     })
     return record.token;
+}
+
+async function register(username, password, privilege = 1) {
+    if (await account.findOne({attributes: ["username"], where: {username}}) === null) {
+        await account.create({username, password: await argon2.hash(password), privilege});
+        logger.log("REGISTER", `New user '${username}' has registered.`)
+        return {
+            status: 201,
+        }
+    } else {
+        logger.log("REGISTER", `New user '${username}' register failed, as username is occupied.`)
+        return {
+            status: 409,
+            message: "Username already exists",
+        };
+    }
+}
+
+async function removeToken(arg) {
+    if (arg === undefined || arg === null) {
+        await account.destroy({
+            where: {
+                expire: {
+                    [Op.lt]: Date.now(),
+                },
+            },
+        });
+    } else if (typeof arg === "number") {
+        await token.destroy({
+            where: {
+                account: arg,
+            },
+        });
+    } else if (typeof arg === "string") {
+        await token.destroy({
+            where: {
+                token: arg,
+            },
+        });
+    }
 }
 
 module.exports.db = db;
@@ -97,3 +138,4 @@ module.exports.token = token;
 
 module.exports.init = init;
 module.exports.login = login;
+module.exports.register = register;
