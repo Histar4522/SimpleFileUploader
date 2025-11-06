@@ -1,36 +1,25 @@
-function info(from, content){
-    console.log(`[${getTime()}][INFO][${from}] ${content}`)
-}
-
-function warn(from, content){
-    console.warn(`[${getTime()}][WARN][${from}] ${content}`)
-}
-
-function error(from, content){
-    console.error(`[${getTime()}][ERROR][${from}] ${content}`)
-}
-
-function debug(from, content){
-    console.debug(`[${getTime()}][DEBUG][${from}] ${content}`)
-}
+const pad = (n) => String(n).padStart(2, '0');
 
 function getTime() {
-    const time = new Date();
-
-    const month = String(time.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-    const day = String(time.getDate()).padStart(2, '0');
-    const year = time.getFullYear();
-
-    const hours = String(time.getHours()).padStart(2, '0');
-    const minutes = String(time.getMinutes()).padStart(2, '0');
-    const seconds = String(time.getSeconds()).padStart(2, '0');
-
-    return `${month}/${day}/${year};${hours}.${minutes}.${seconds}`;
+    const d = new Date();
+    const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    const time = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+    return `${date} ${time}`;
 }
 
-module.exports.log = info;
-module.exports.info = info;
-module.exports.warn = warn;
-module.exports.error = error;
-module.exports.err = error;
-module.exports.debug = debug;
+function createLogger(level, method) {
+    return (arg0, arg1) => {
+        if (arg1 === undefined) {
+            method(`[${getTime()}][${level}][GENERAL] ${arg0}`);
+        } else {
+            method(`[${getTime()}][${level}][${arg0}] ${arg1}`);
+        }
+    };
+}
+
+const info = createLogger('INFO', console.log);
+const warn = createLogger('WARN', console.warn);
+const error = createLogger('ERROR', console.error);
+const debug = createLogger('DEBUG', console.debug);
+
+module.exports = { log: info, info, warn, error, err: error, debug };
