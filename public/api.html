@@ -54,9 +54,14 @@
     </ul>
     <h3>Result format</h3>
     <p><code>{filename: [File UUID]}</code></p>
+    <h2>4. POST /files/:filename</h2>
+    <p>Create an alias of a file. Deleting alias won't affect the original file.</p>
+    <p>Example: <code>/files/b5166d9c-8273-4969-badd-b00768d707a6</code></p>
+    <h3>Result format</h3>
+    <p><code>{filename: [File UUID]}</code></p>
     <p>Example: <code>{"filename": "875ec8d9-a512-436b-8d3f-adaa2122b7b7"}</code></p>
     <br>
-    <h2>4. DELETE /files/:filename</h2>
+    <h2>5. DELETE /files/:filename</h2>
     <p>Delete a file using its file uuid</p>
     <p>Example: <code>/files/875ec8d9-a512-436b-8d3f-adaa2122b7b7</code></p>
     </div>

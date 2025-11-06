@@ -1,7 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 
-module.exports = function route(router) {
+module.exports = function(router) {
     router.get("/", async (ctx, next) => {
         ctx.body = fs.createReadStream(path.join(".", "public", "api.html"))
         ctx.response.type = "text/html";

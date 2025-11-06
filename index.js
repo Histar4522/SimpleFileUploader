@@ -1,10 +1,14 @@
 const Koa = require("koa");
+const database = require("./src/server/database")
+const logger = require("./src/util/logger")
 
 const middlewareLoader = require("./src/server/middleware-loader.js")
 
 const server = new Koa();
 
 (async () => {
+    logger.log("SERVER", "Server Starting...");
+    await database.init();
     server.use(async (ctx, next) => {
         ctx.set("Access-Control-Allow-Origin", "*");
         ctx.set("Access-Control-Allow-Methods", "GET, POST, DELETE, OPTIONS");
@@ -17,7 +21,7 @@ const server = new Koa();
     });
     server.use((await middlewareLoader()).routes());
     server.listen(8080, () => {
-        console.log("Server successfully launched on port 8080.")
+        logger.log("SERVER","Server successfully launched on port 8080.")
     })
 })();
 
