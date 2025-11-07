@@ -23,6 +23,7 @@ module.exports = function(router) {
             const result = await database.login(username, password);
             ctx.status = result.status;
             ctx.body = result;
+            ctx.cookies.set("token", "result.token;", {maxAge: 1800000, overwrite: true})
         } catch (e) {
             logger.err(e)
             ctx.status = 500;
@@ -43,4 +44,16 @@ module.exports = function(router) {
         }
         await next();
     });
+    router.get("/api/auth/logout", async (ctx, next) => {
+        const userToken = ctx.cookies.get("token");
+        if (userToken !== undefined) {
+            const result = await database.logout(userToken);
+            ctx.body = result;
+            ctx.status = result.status;
+        } else {
+            ctx.body = {status: 400, message: "No token found"}
+            ctx.status = 400;
+        }
+        await next();
+    })
 };

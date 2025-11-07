@@ -1,6 +1,7 @@
 const Koa = require("koa");
 const database = require("./src/server/database")
 const logger = require("./src/util/logger")
+const daemon = require("./src/daemons/daemon")
 
 const middlewareLoader = require("./src/server/middleware-loader.js")
 
@@ -21,8 +22,9 @@ const server = new Koa();
     });
     server.use((await middlewareLoader()).routes());
     server.listen(8080, () => {
-        logger.log("SERVER","Server successfully launched on port 8080.")
+        logger.log("SERVER","Server successfully launched on port 8080.");
     })
+    daemon();
 })();
 
 module.exports = server;

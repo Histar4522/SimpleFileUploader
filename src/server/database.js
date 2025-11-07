@@ -44,6 +44,10 @@ const token = db.define("token", {
     expire: {
         type: DataTypes.BIGINT,
     },
+});
+
+token.afterDestroy((instance, options) => {
+    logger.debug("DATABASE", `Token ${instance.token} has been destroyed`)
 })
 
 async function init() {
@@ -110,25 +114,53 @@ async function register(username, password, privilege = 1) {
 
 async function removeToken(arg) {
     if (arg === undefined || arg === null) {
-        await account.destroy({
+        const result = await token.destroy({
             where: {
                 expire: {
                     [Op.lt]: Date.now(),
                 },
             },
         });
+        logger.log("DATABASE", `${result} token(s) has been removed by this operation.`)
     } else if (typeof arg === "number") {
-        await token.destroy({
+        const result = await token.destroy({
             where: {
                 account: arg,
             },
         });
+        logger.log("DATABASE", `${result} token(s) has been removed by this operation.`)
     } else if (typeof arg === "string") {
-        await token.destroy({
+        const result = await token.destroy({
             where: {
                 token: arg,
             },
         });
+        logger.log("DATABASE", `${result} token(s) has been removed by this operation.`)
+    }
+}
+
+async function logout(usertoken) {
+    const requestedToken = await token.findOne({
+        attributes: [
+            "token",
+            "account",
+        ],
+        where: {
+            token: usertoken,
+        },
+    })
+    if (requestedToken === null) {
+        logger.log("LOGOUT", `Invalid logout request for token '${usertoken}'`)
+        return {
+            status: 400,
+            message: "Token is invalid"
+        }
+    } else {
+        await removeToken(usertoken);
+        logger.log("LOGOUT", `User with token '${usertoken}' has logged out`)
+        return {
+            status: 200,
+        }
     }
 }
 
@@ -139,3 +171,5 @@ module.exports.token = token;
 module.exports.init = init;
 module.exports.login = login;
 module.exports.register = register;
+module.exports.cleanupToken = async function (){ await removeToken(); };
+module.exports.logout = logout;

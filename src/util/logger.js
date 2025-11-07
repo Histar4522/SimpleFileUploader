@@ -10,9 +10,17 @@ function getTime() {
 function createLogger(level, method) {
     return (arg0, arg1) => {
         if (arg1 === undefined) {
-            method(`[${getTime()}][${level}][GENERAL] ${arg0}`);
+            if (arg0 instanceof Error) {
+                method(`[${getTime()}][${level}][GENERAL] ${arg0.stack}`);
+            } else {
+                method(`[${getTime()}][${level}][GENERAL] ${arg0}`);
+            }
         } else {
-            method(`[${getTime()}][${level}][${arg0}] ${arg1}`);
+            if (arg1 instanceof Error) {
+                method(`[${getTime()}][${level}][${arg0}] ${arg1.stack}`);
+            } else {
+                method(`[${getTime()}][${level}][${arg0}] ${arg1}`);
+            }
         }
     };
 }
